@@ -1,16 +1,21 @@
 require('newrelic');
-const express = require('express');
+const fastify = require('fastify');
+// const express = require('express');
 const bodyParser = require('body-parser');
-const routes = require('./routes');
+// const routes = require('./routes');
 
-const app = express();
+const app = fastify();
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use('/products', routes);
+app.register(require('./routes'), { prefix: '/products' });
 
-app.listen('3000', () => {
+const start = async () => {
+  await app.listen(3000);
   console.log('listening on port 3000');
-});
+}
+
+start();
+

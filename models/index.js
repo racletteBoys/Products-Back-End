@@ -26,7 +26,7 @@ const getStyles = async productId => {
     productId,
   ])).rows;
   for (const style of styles) {
-    style.photos = (await db.query('SELECT * FROM photos WHERE style_id = $1', [
+    style.photos = (await db.query('SELECT url, thumbnail_url FROM photos WHERE style_id = $1', [
       style.id,
     ])).rows;
   }
@@ -59,7 +59,8 @@ const addProduct = product => {
   );
 };
 
-const updateProduct = (productId, product) => db.query(
+const updateProduct = (productId, product) =>
+  db.query(
     'UPDATE products SET name = COALESCE($1, name), slogan = COALESCE($2, slogan), description = COALESCE($3, description), category = COALESCE($4, category), default_price = COALESCE($5, default_price) WHERE id = $6',
     [
       product.name,
@@ -71,7 +72,8 @@ const updateProduct = (productId, product) => db.query(
     ]
   );
 
-const removeProduct = productId => db.query('DELETE FROM products WHERE id = $1', [productId]);
+const removeProduct = productId =>
+  db.query('DELETE FROM products WHERE id = $1', [productId]);
 
 const addStyle = (productId, style) => {
   const values = [
