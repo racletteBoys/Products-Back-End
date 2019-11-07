@@ -13,8 +13,8 @@ app.use(bodyParser.json());
 app.register(require('./routes'), { prefix: '/products' });
 
 const start = async () => {
-  await app.listen(3000);
-  console.log('listening on port 3000');
+  await app.listen(3001);
+  console.log('listening on port 3001');
 }
 
 start();

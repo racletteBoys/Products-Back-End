@@ -14,7 +14,7 @@ const getProduct = id =>
   db.query('SELECT * FROM products WHERE id = $1', [id]).then(({ rows }) => {
     const product = rows[0];
     return db
-      .query('SELECT * FROM features WHERE product_id = $1', [id])
+      .query('SELECT feature_name AS feature, feature_value AS value FROM features WHERE product_id = $1', [id])
       .then(({ rows }) => {
         product.features = rows;
         return product;
@@ -22,15 +22,26 @@ const getProduct = id =>
   });
 
 const getStyles = async productId => {
-  const styles = (await db.query('SELECT * FROM styles WHERE product_id = $1', [
+  const styles = (await db.query('SELECT id AS style_id, style_name AS name, original_price, sale_price, is_default AS "default?" FROM styles WHERE product_id = $1', [
     productId,
   ])).rows;
   for (const style of styles) {
-    style.photos = (await db.query('SELECT url, thumbnail_url FROM photos WHERE style_id = $1', [
-      style.id,
+    style['default?'] = Number(style['default?']);
+    style.photos = (await db.query('SELECT thumbnail_url, url FROM photos WHERE style_id = $1', [
+      style.style_id,
     ])).rows;
+    let skus = {};
+    let skuResults = (await db.query('SELECT size, quantity FROM sizes WHERE style_id = $1', [style.style_id])).rows;
+    for (const sku of skuResults) {
+      skus[sku.size] = sku.quantity;
+    }
+    style.skus = skus;
   }
-  return styles;
+  // console.log(styles[0].photos[0].thumbnail_url);
+  return {
+    product_id: productId,
+    results: styles,
+  }
 };
 
 const getRelated = async productId => {
