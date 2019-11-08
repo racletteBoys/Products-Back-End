@@ -4,6 +4,7 @@ const fastify = require('fastify');
 const bodyParser = require('body-parser');
 // const routes = require('./routes');
 
+
 const app = fastify();
 
 // Middleware
